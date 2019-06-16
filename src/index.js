@@ -1,7 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+// import App from './NewFeature/Context01';
+// import App from './NewFeature/Context02';
+// import App from './NewFeature/Context03';
+// import App from './NewFeature/Context04';
+// import App from './NewFeature/lazy&Suspense/index';
+// import App from './NewFeature/Memo01'
+// import App from './NewFeature/Memo02';
+import App from './NewFeature/Memo03';
+
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(<App />, document.getElementById('root'));

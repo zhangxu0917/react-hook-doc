@@ -19,19 +19,19 @@ class App extends Component {
 	};
 
 	// FIXME: ErrorBoundry声明方式1
-	/*componentDidCatch(error, errorInfo) {
+	componentDidCatch(error, errorInfo) {
 		this.setState({
 			hasError: true
 		})
-	}*/
+	}
 
 	// FIXME: ErrorBoundry声明方式2
-	static getDerivedStateFromError () {
+	/*static getDerivedStateFromError () {
 		 // FIXME: 一旦遇到错误，都会返回一个新的数据，合并到当前的state对象中
 		return {
 			hasError: true
 		}
-	}
+	}*/
 
 	render() {
 		if (this.state.hasError) {
