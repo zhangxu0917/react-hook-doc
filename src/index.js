@@ -8,7 +8,12 @@ import './index.css';
 // import App from './NewFeature/lazy&Suspense/index';
 // import App from './NewFeature/Memo01'
 // import App from './NewFeature/Memo02';
-import App from './NewFeature/Memo03';
+// import App from './NewFeature/Memo03';
+// import App from './Hooks/useState.jsx';
+// import App from './Hooks/useEffect.jsx';
+// import App from './Hooks/useContext.jsx';
+// import App from './Hooks/useMemo.jsx';
+import App from './Hooks/useRef.jsx';
 
 import * as serviceWorker from './serviceWorker';
 

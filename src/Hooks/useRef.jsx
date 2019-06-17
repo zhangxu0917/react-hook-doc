@@ -1,0 +1,71 @@
+import React, {useState, PureComponent, useEffect, useMemo, useCallback, useRef} from 'react';
+
+class Counter extends PureComponent {
+	speak = () => {
+		console.log(`this.count is ${this.props.count}`)
+	};
+
+	render() {
+		const {props} = this;
+		return (
+			<h1 onClick={props.onClick}>Count: {props.count}</h1>
+		)
+	}
+}
+
+function FuncApp() {
+	const [count, setCount] = useState(0);
+	const counterRef = useRef();
+
+	// FIXME: useEffect 执行的是副作用，是在渲染之后执行的；useMemo 是赋值行为，需要参与渲染，在渲染之前执行；
+	const double = useMemo(() => {
+		/**
+		 * FIXME: count === 3 初始值为false，
+		 *  当count === 3，useMemo发生改变，触发重新渲染，
+		 *  当count + 1 再次不等于3，再次触发重新渲染，
+		 *  再向后，不在触发重新计算
+		 */
+		return count * 2;
+	}, [count === 3]);
+
+	/**
+	 * FIXME: useRef的第二个作用，用来同步需要在不同生命周期中共享的数据
+	 *  执行两个逻辑
+	 *  1. 在组件渲染是，绑定一个定时器，每秒钟count加1
+	 *  2. 当count >= 10 以后，就不在自动增加
+ 	 */
+	let it = useRef();
+	useEffect(() => {
+		it.current = setInterval(() => {
+			setCount(count => count + 1);
+		}, 1000)
+	}, []);
+
+	useEffect(() => {
+		if (count >= 10) {
+			clearInterval(it.current);
+			it = null;
+		}
+	}, [count]);
+
+	const onClick = useCallback(() => {
+		console.log('Click');
+		// FIXME: 使用current属性来获取到最终的值
+		console.log(counterRef.current);
+		counterRef.current.speak();
+	}, [counterRef]);
+
+
+
+	return (
+		<div>
+			<button type={'button'} onClick={() => {
+				setCount(count + 1)
+			}}>Add Count
+			</button>
+			<Counter ref={counterRef} count={count} onClick={onClick}/>
+		</div>
+	)
+}
+
+export default FuncApp;
