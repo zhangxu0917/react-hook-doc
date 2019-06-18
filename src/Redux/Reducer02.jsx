@@ -1,10 +1,36 @@
+/**
+ * @Author: Zhangxu
+ * @Date: 2019-06-18 15:52
+ * @LastEditors: Zhangxu
+ * @LastEditTime: 2019-06-18 15:52
+ * @description: 使用Reducers拆解Reducer中的多个state
+ */
+
 import React, {useState, useCallback, useRef, useEffect, memo} from 'react';
 import './App.css'
+import {createAdd, createRemove, createSet, createToggle} from "./actions";
+import reducer from './reducers'
 
 // FIXME: 创建全局的唯一标示位
 let idSeq = Date.now();
 // FIXME: localStorage的key
 let LS_KEY = '_$_todos_';
+
+function bindActionCreators(actionCreators, dispatch) {
+	const ret = {};
+
+	for (let key in actionCreators) {
+		if (actionCreators.hasOwnProperty(key)) {
+			ret[key] = function (...args) {
+				const actionCreator = actionCreators[key];
+				const action = actionCreator(...args);
+				dispatch(action);
+			}
+		}
+	}
+
+	return ret;
+}
 
 let Control = memo(function (props) {
 	const {addTodo} = props;
@@ -45,7 +71,7 @@ let TodoItem = memo(function (props) {
 			completed,
 		},
 		removeTodo,
-		toggleTodo
+		toggleTodo,
 	} = props;
 
 	const onChange = () => {
@@ -73,7 +99,7 @@ const Todos = memo(function (props) {
 	let {
 		removeTodo,
 		toggleTodo,
-		todos
+		todos,
 	} = props;
 
 	return (
@@ -96,30 +122,29 @@ const Todos = memo(function (props) {
 
 function BasicTodo(props) {
 	const [todos, setTodos] = useState([]);
+	const [incrementCount, setIncrementCount] = useState(0);
 
-	const addTodo = useCallback((todo) => {
-		setTodos(todos => [...todos, todo])
-	}, []);
+	// FIXME: 创建一个dispatch函数，其参数为action，他的核心思想是让所有的数据更新操作都经过dispatch函数
+	const dispatch = useCallback((action) => {
+		const state = {
+			todos,
+			incrementCount
+		};
 
-	const removeTodo = useCallback((id) => {
-		setTodos(todos => todos.filter(item => {
-			return item.id !== id
-		}))
-	}, []);
+		const setters = {
+			todos: setTodos,
+			incrementCount: setIncrementCount
+		};
 
-	const toggleTodo = useCallback((id) => {
-		setTodos(todos => todos.map(todo => {
-			return todo.id === id ? {
-					...todo,
-					completed: !todo.completed
-				}
-				: todo;
-		}))
-	}, []);
+		const newState = reducer(state, action);
+		for (let key in newState) {
+			setters[key](newState[key])
+		}
+	}, [todos, incrementCount]);
 
 	useEffect(() => {
 		const todos = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
-		setTodos(todos);
+		dispatch(createSet(todos));
 	}, []);
 
 	useEffect(() => {
@@ -128,10 +153,21 @@ function BasicTodo(props) {
 
 	return (
 		<div className={'todo-list'}>
-			<Control addTodo={addTodo}/>
+			<Control
+				{
+					...bindActionCreators({
+						addTodo: createAdd,
+					}, dispatch)
+				}
+			/>
 			<Todos
-				removeTodo={removeTodo}
-				toggleTodo={toggleTodo}
+				dispatch={dispatch}
+				{
+					...bindActionCreators({
+						toggleTodo: createToggle,
+						removeTodo: createRemove
+					}, dispatch)
+				}
 				todos={todos}
 			/>
 		</div>

@@ -15,8 +15,11 @@ import './index.css';
 // import App from './Hooks/useMemo.jsx';
 // import App from './Hooks/useRef.jsx';
 // import App from './Hooks/customHooks.jsx';
-
-import App from './Temp/index.jsx';
+// import App from './Redux/Dispatch&Action01.jsx';
+// import App from './Redux/Dispatch&Action02.jsx';
+// import App from './Redux/Dispatch&Action03.jsx';
+// import App from './Redux/Reducer01.jsx';
+import App from './Redux/Reducer02.jsx';
 
 import * as serviceWorker from './serviceWorker';
 

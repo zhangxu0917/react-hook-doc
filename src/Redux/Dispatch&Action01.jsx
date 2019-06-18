@@ -1,3 +1,11 @@
+/**
+ * @Author: Zhangxu
+ * @Date: 2019-06-18 15:50
+ * @LastEditors: Zhangxu
+ * @LastEditTime: 2019-06-18 15:50
+ * @description: 使用dispatch统一数据处理行为
+ */
+
 import React, {useState, useCallback, useRef, useEffect, memo} from 'react';
 import './App.css'
 
@@ -7,7 +15,7 @@ let idSeq = Date.now();
 let LS_KEY = '_$_todos_';
 
 let Control = memo(function (props) {
-	const {addTodo} = props;
+	const {dispatch} = props;
 	let inputRef = useRef();
 
 	const onSubmit = (e) => {
@@ -18,10 +26,13 @@ let Control = memo(function (props) {
 			return;
 		}
 
-		addTodo({
-			id: ++idSeq,
-			text: newText,
-			completed: false
+		dispatch({
+			type: 'add',
+			payload: {
+				id: ++idSeq,
+				text: newText,
+				completed: false
+			}
 		});
 
 		inputRef.current.value = '';
@@ -44,16 +55,15 @@ let TodoItem = memo(function (props) {
 			text,
 			completed,
 		},
-		removeTodo,
-		toggleTodo
+		dispatch,
 	} = props;
 
 	const onChange = () => {
-		toggleTodo(id);
+		dispatch({type: 'toggle', payload: id});
 	};
 
 	const onRemove = () => {
-		removeTodo(id);
+		dispatch({type: 'remove', payload: id});
 	};
 
 	return (
@@ -71,11 +81,10 @@ let TodoItem = memo(function (props) {
 
 const Todos = memo(function (props) {
 	let {
-		removeTodo,
-		toggleTodo,
-		todos
+		dispatch,
+		todos,
 	} = props;
-
+	console.log(todos)
 	return (
 		<ul>
 			{
@@ -83,8 +92,7 @@ const Todos = memo(function (props) {
 					return (
 						<TodoItem
 							todo={todo}
-							removeTodo={removeTodo}
-							toggleTodo={toggleTodo}
+							dispatch={dispatch}
 							key={todo.id}
 						/>
 					)
@@ -97,7 +105,7 @@ const Todos = memo(function (props) {
 function BasicTodo(props) {
 	const [todos, setTodos] = useState([]);
 
-	const addTodo = useCallback((todo) => {
+	/*const addTodo = useCallback((todo) => {
 		setTodos(todos => [...todos, todo])
 	}, []);
 
@@ -115,11 +123,42 @@ function BasicTodo(props) {
 				}
 				: todo;
 		}))
+	}, []);*/
+
+	// FIXME: 创建一个dispatch函数，其参数为action，他的核心思想是让所有的数据更新操作都经过dispatch函数
+	const dispatch = useCallback((action) => {
+		// FIXME: 从action中解构出type和payload
+		const {type, payload} = action;
+		switch (type) {
+			case 'set':
+				console.log(payload);
+				setTodos(payload);
+				break;
+			case 'add':
+				setTodos(todos => [...todos, payload]);
+				break;
+			case 'remove':
+				setTodos(todos => todos.filter(item => {
+					return item.id !== payload
+				}));
+				break;
+			case 'toggle':
+				setTodos(todos => todos.map(todo => {
+					return todo.id === payload ? {
+							...todo,
+							completed: !todo.completed
+						}
+						: todo;
+				}));
+				break;
+			default:
+				break;
+		}
 	}, []);
 
 	useEffect(() => {
-		const todos = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
-		setTodos(todos);
+		const todos = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+		dispatch({type: 'set', payload: todos})
 	}, []);
 
 	useEffect(() => {
@@ -128,10 +167,9 @@ function BasicTodo(props) {
 
 	return (
 		<div className={'todo-list'}>
-			<Control addTodo={addTodo}/>
+			<Control dispatch={dispatch}/>
 			<Todos
-				removeTodo={removeTodo}
-				toggleTodo={toggleTodo}
+				dispatch={dispatch}
 				todos={todos}
 			/>
 		</div>
