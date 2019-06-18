@@ -14,7 +14,9 @@ import './index.css';
 // import App from './Hooks/useContext.jsx';
 // import App from './Hooks/useMemo.jsx';
 // import App from './Hooks/useRef.jsx';
-import App from './Hooks/customHooks.jsx';
+// import App from './Hooks/customHooks.jsx';
+
+import App from './Temp/index.jsx';
 
 import * as serviceWorker from './serviceWorker';
 
