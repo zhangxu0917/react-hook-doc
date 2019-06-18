@@ -19,7 +19,8 @@ import './index.css';
 // import App from './Redux/Dispatch&Action02.jsx';
 // import App from './Redux/Dispatch&Action03.jsx';
 // import App from './Redux/Reducer01.jsx';
-import App from './Redux/Reducer02.jsx';
+// import App from './Redux/Reducer02.jsx';
+import App from './Redux/AsyncAction/AsyncAction.jsx';
 
 import * as serviceWorker from './serviceWorker';
 
